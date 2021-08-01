@@ -13,6 +13,18 @@ let checkPath = function (pathArr) {
   }
   return true;
 };
+let checkCmd = function (cmArray) {
+  for (let i = 0; i < cmArray.length; i++) {
+    if (cmArray[i] !== "-s" && cmArray[i] !== "-b" && cmArray[i] !== "-n")
+      return false;
+  }
+  return true;
+};
+let getCmd = function (cmArray) {
+  for (let i = 0; i < cmArray.length; i++) {
+    if (cmArray[i] == "-b" || cmArray[i] == "-n") return cmdArray[i];
+  }
+};
 for (let i = 0; i < inputArray.length; i++) {
   let content = inputArray[i];
   if (content == "-n" || content == "-b" || content == "-s")
@@ -21,65 +33,28 @@ for (let i = 0; i < inputArray.length; i++) {
     pathArray.push(content);
   }
 }
-if (checkPath(pathArray)) {
-  if (cmdArray.length == 0) readFile(pathArray);
+if (!checkPath(pathArray)) {
+  console.log("Invalid paths entered");
+  return;
+}
+if (!checkCmd(cmdArray)) {
+  console.log("Invalid set of command(s) entered.");
+  return;
+}
+
+let getFirstNoneMinusSCmd = getCmd(cmdArray);
+if (cmdArray.length == 0) {
+  readFile(pathArray);
+  return;
+}
+if (cmdArray.indexOf("-s") != -1) {
+  let contentMinusLine = minusS(pathArray);
+  if (getFirstNoneMinusSCmd == undefined) console.log(contentMinusLine);
   else {
-    if (cmdArray.length == 1) {
-      if (cmdArray[0] == "-s") {
-        minusS(pathArray);
-      } else if (cmdArray[0] == "-n") {
-        minusN(pathArray);
-      } else if (cmdArray[0] == "-b") {
-        minusB(pathArray);
-      } else {
-        console.log(
-          "Invalid Command option entered.Try giving a correct command"
-        );
-        return;
-      }
-    } else if (cmdArray.length == 2) {
-      if (cmdArray.indexOf("-s") !== -1) {
-        let content = minusS(pathArray, 1);
-        if (cmdArray.indexOf("-n") !== -1) {
-          minusNFiltered(content);
-        } else if (cmdArray.indexOf("-b") !== -1) {
-          minusBFiltered(content);
-        } else {
-          console.log(
-            "Invalid Command option entered.Try giving a correct command"
-          );
-          return;
-        }
-      } else {
-        if (cmdArray[0] == "-n" || cmdArray[0] == "-b") {
-          if (cmdArray[0] == "-n") {
-            minusN(pathArray);
-          } else {
-            minusB(pathArray);
-          }
-        } else {
-          console.log("Invalid Command.Enter correct command");
-          return;
-        }
-      }
-    } else if (cmdArray.length == 3) {
-      if (cmdArray.indexOf("-s") !== -1) {
-        let content = minusS(pathArray, 1);
-        if (cmdArray[0] == "-n") minusNFiltered(content);
-        else if (cmdArray[0] == "-b") minusBFiltered(content);
-        else {
-          console.log("Invalid COmmand Argument");
-        }
-      } else {
-        if (cmdArray[0] == "-n") minusN(pathArray);
-        else if (cmdArray[0] == "-b") minusB(pathArray);
-        else {
-          console.log("Invalid COmmand Argument");
-        }
-      }
-    }
+    if (getFirstNoneMinusSCmd == "-n") minusNFiltered(contentMinusLine);
+    else minusBFiltered(contentMinusLine);
   }
 } else {
-  console.log("Invalid file path/s entered.Please enter valid file paths.");
-  return;
+  if (getFirstNoneMinusSCmd == "-n") minusN(pathArray);
+  else minusB(pathArray);
 }
